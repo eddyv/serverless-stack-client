@@ -5,9 +5,37 @@ import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 // uses browsers history api to create real urls
 import { BrowserRouter as Router } from "react-router-dom";
+import Amplify from "aws-amplify";
+import config from "./config";
+
+Amplify.configure({
+  //cognito
+  Auth: {
+    mandatorySignIn: true,
+    region: config.cognito.REGION,
+    userPoolId: config.cognito.USER_POOL_ID,
+    identityPoolId: config.cognito.IDENTITY_POOL_ID,
+    userPoolWebClientId: config.cognito.APP_CLIENT_ID
+  },
+  //s3
+  Storage: {
+    region: config.s3.REGION,
+    bucket: config.s3.BUCKET,
+    identityPoolId: config.cognito.IDENTITY_POOL_ID
+  },
+  //api gateway
+  API: {
+    endpoints: [
+      {
+        name: "notes",
+        endpoint: config.apiGateway.URL,
+        region: config.apiGateway.REGION
+      }
+    ]
+  }
+});
 
 //ReactDOM.render(<App />, document.getElementById('root'));
-
 // Uses router to render out app component. This will allow us to create routes we need inside our app component.
 ReactDOM.render(
   <Router>
