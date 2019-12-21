@@ -34,10 +34,12 @@ function App() {
     setIsAuthenticating(false);
   }
 
-  function handleLogout() {
+  async function handleLogout() {
+    await Auth.signOut();
     userHasAuthenticated(false);
   }
   return (
+    // We hold off on rendering the app until we are done checking the users authentication status.
     !isAuthenticating && (
       <div className="App container">
         <Navbar fluid collapseOnSelect bg="light">
