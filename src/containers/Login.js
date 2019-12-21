@@ -1,27 +1,39 @@
 import React, { useState } from "react";
-import { Form, Button } from "react-bootstrap";
+import { Form } from "react-bootstrap";
+import LoaderButton from "../components/LoaderButton";
 import "./Login.css";
 import { Auth } from "aws-amplify";
 
 export default function Login(props) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [validated, setValidated] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
+  function validateForm(form) {
+    return email.length > 0 && password.length > 0;
+  }
   const handleSubmit = async event => {
     event.preventDefault();
     const form = event.currentTarget;
-    setValidated(true);
+    setIsLoading(true);
     try {
-      await Auth.signIn(email, password);
-      props.userHasAuthenticated(true);
-      //redirect to homepage
-      props.history.push("/");
+      if (form.checkValidity() === true) {
+        setValidated(true);
+        await Auth.signIn(email, password);
+        props.userHasAuthenticated(true);
+        //redirect to homepage
+        props.history.push("/");
+      } else {
+        event.stopPropagation();
+        setIsLoading(false);
+      }
     } catch (e) {
       alert(e.message);
+      setIsLoading(false);
     }
   };
+
   return (
     <div className="Login">
       <Form validated={validated} onSubmit={handleSubmit}>
@@ -50,9 +62,15 @@ export default function Login(props) {
           />
           <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
         </Form.Group>
-        <Button size="lg" type="submit">
+        <LoaderButton
+          block
+          type="submit"
+          bsSize="large"
+          isLoading={isLoading}
+          disabled={!validateForm()}
+        >
           Login
-        </Button>
+        </LoaderButton>
       </Form>
     </div>
   );
