@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import { Navbar, Nav } from "react-bootstrap";
 import Routes from "./Routes";
 import { LinkContainer } from "react-router-bootstrap";
@@ -7,7 +7,7 @@ import { Auth } from "aws-amplify";
 
 import "./App.css";
 
-function App() {
+function App(props) {
   const [isAuthenticated, userHasAuthenticated] = useState(false);
   //this is used to maintain the state of our authentication
   const [isAuthenticating, setIsAuthenticating] = useState(true);
@@ -34,9 +34,12 @@ function App() {
     setIsAuthenticating(false);
   }
 
+  //clear the current sesion
   async function handleLogout() {
     await Auth.signOut();
     userHasAuthenticated(false);
+    //redirect to login page
+    props.history.push("/login");
   }
   return (
     // We hold off on rendering the app until we are done checking the users authentication status.
@@ -74,4 +77,4 @@ function App() {
   );
 }
 
-export default App;
+export default withRouter(App);
