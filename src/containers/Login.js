@@ -1,17 +1,19 @@
 import React, { useState } from "react";
 import { Form } from "react-bootstrap";
 import LoaderButton from "../components/LoaderButton";
-import "./Login.css";
 import { Auth } from "aws-amplify";
+import { useFormFields } from "../libs/hooksLib";
+import "./Login.css";
 
 export default function Login(props) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [validated, setValidated] = useState(false);
+  const [fields, handleFieldChange] = useFormFields({
+    email: "",
+    password: ""
+  });
   const [isLoading, setIsLoading] = useState(false);
 
-  function validateForm(form) {
-    return email.length > 0 && password.length > 0;
+  function validateForm() {
+    return fields.email.length > 0 && fields.password.length > 0;
   }
   const handleSubmit = async event => {
     event.preventDefault();
@@ -19,8 +21,7 @@ export default function Login(props) {
     setIsLoading(true);
     try {
       if (form.checkValidity() === true) {
-        setValidated(true);
-        await Auth.signIn(email, password);
+        await Auth.signIn(fields.email, fields.password);
         props.userHasAuthenticated(true);
         //redirect to homepage
         props.history.push("/");
@@ -36,7 +37,7 @@ export default function Login(props) {
 
   return (
     <div className="Login">
-      <Form validated={validated} onSubmit={handleSubmit}>
+      <Form onSubmit={handleSubmit}>
         <Form.Group controlId="email" size="lg">
           <Form.Label>Email</Form.Label>
           <Form.Control
@@ -44,9 +45,9 @@ export default function Login(props) {
             type="email"
             placeholder="sample@gmail.com"
             defaultValue=""
-            value={email}
+            value={fields.email}
             autoFocus
-            onChange={e => setEmail(e.target.value)}
+            onChange={handleFieldChange}
           />
           <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
         </Form.Group>
@@ -57,8 +58,8 @@ export default function Login(props) {
             type="password"
             placeholder="Password"
             defaultValue=""
-            value={password}
-            onChange={e => setPassword(e.target.value)}
+            value={fields.password}
+            onChange={handleFieldChange}
           />
           <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
         </Form.Group>
