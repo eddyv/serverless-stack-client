@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
+import { useHistory, Link as RouterLink } from "react-router-dom";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -17,6 +17,7 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import { Auth } from "aws-amplify";
 import { useAppContext } from "../libs/contextLib";
 import { onError } from "../libs/errorLib";
+import { useFormFields } from "../libs/hooksLib";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -57,11 +58,13 @@ export default function Login() {
   const classes = useStyles();
   const history = useHistory();
   const [isLoading, setIsLoading] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [fields, handleFieldChange] = useFormFields({
+    email: "",
+    password: "",
+  });
 
   function validateForm() {
-    return email.length > 0 && password.length > 0;
+    return fields.email.length > 0 && fields.password.length > 0;
   }
 
   /*
@@ -72,7 +75,7 @@ export default function Login() {
     setIsLoading(true);
 
     try {
-      await Auth.signIn(email, password);
+      await Auth.signIn(fields.email, fields.password);
       userHasAuthenticated(true);
       history.push("/");
     } catch (e) {
@@ -102,8 +105,8 @@ export default function Login() {
             name="email"
             autoComplete="email"
             autoFocus
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={fields.email}
+            onChange={handleFieldChange}
           />
           <TextField
             variant="outlined"
@@ -115,8 +118,8 @@ export default function Login() {
             type="password"
             id="password"
             autoComplete="current-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={fields.password}
+            onChange={handleFieldChange}
           />
           <Grid container>
             <Grid item>
@@ -145,13 +148,13 @@ export default function Login() {
           </Button>
           <Grid container>
             <Grid item xs>
-              <Link href="#" variant="body2">
+              <Link component={RouterLink} to="/login/reset" variant="body2">
                 Forgot password?
               </Link>
             </Grid>
             <Grid item>
-              <Link href="#" variant="body2">
-                {"Don't have an account? Sign Up"}
+              <Link component={RouterLink} to="/signup" variant="body2">
+                Don't have an account? Sign Up
               </Link>
             </Grid>
           </Grid>
