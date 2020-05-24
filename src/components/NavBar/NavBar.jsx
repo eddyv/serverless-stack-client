@@ -6,7 +6,9 @@ import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
 import MenuIcon from "@material-ui/icons/Menu";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useHistory } from "react-router-dom";
+import { useAppContext } from "../../libs/contextLib";
+import { Auth } from "aws-amplify";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -23,7 +25,14 @@ const useStyles = makeStyles((theme) => ({
 
 export default function NavBar() {
   const classes = useStyles();
-
+  const history = useHistory();
+  const { userHasAuthenticated, isAuthenticated } = useAppContext();
+  
+  async function handleLogout() {
+    await Auth.signOut();
+    userHasAuthenticated(false);
+    history.push("/login");
+  }
   return (
     <div className={classes.root}>
       <AppBar position="static">
@@ -41,12 +50,20 @@ export default function NavBar() {
               Scratch
             </Button>
           </Typography>
-          <Button color="inherit" component={RouterLink} to="/signup">
-            Signup
-          </Button>
-          <Button color="inherit" component={RouterLink} to="/login">
-            Login
-          </Button>
+          {isAuthenticated ? (
+            <Button color="inherit" onClick={handleLogout}>
+              Logout
+            </Button>
+          ) : (
+            <>
+              <Button color="inherit" component={RouterLink} to="/signup">
+                Signup
+              </Button>
+              <Button color="inherit" component={RouterLink} to="/login">
+                Login
+              </Button>
+            </>
+          )}
         </Toolbar>
       </AppBar>
     </div>
