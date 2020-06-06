@@ -81,7 +81,6 @@ export default function ResetPassword() {
     event.preventDefault();
 
     setIsSendingCode(true);
-
     try {
       await Auth.forgotPassword(fields.email);
       setCodeSent(true);
@@ -180,9 +179,7 @@ export default function ResetPassword() {
               value={fields.code}
               onChange={handleFieldChange}
               helperText={
-                "Please check your email " +
-                fields.email +
-                " for the confirmation code."
+                "Please check " + fields.email + " for the confirmation code."
               }
             />
             <TextField
@@ -233,15 +230,18 @@ export default function ResetPassword() {
 
   function renderSuccessMessage() {
     return (
-      <div className="success">
-        <DoneIcon />
-        <p>Your password has been reset.</p>
-        <p>
-          <Link component={RouterLink} to="/login" variant="body2">
-            Click here to login with your new credentials.
-          </Link>
-        </p>
-      </div>
+      <Container component="main" maxWidth="xs">
+        <CssBaseline />
+        <div className={classes.paper}>
+          <DoneIcon />
+          <p>Your password has been reset.</p>
+          <p>
+            <Link component={RouterLink} to="/login" variant="body2">
+              Click here to login with your new credentials.
+            </Link>
+          </p>
+        </div>
+      </Container>
     );
   }
 
